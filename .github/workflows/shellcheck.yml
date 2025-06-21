@@ -1,0 +1,29 @@
+name: ShellCheck Lint
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  shellcheck:
+    name: Run ShellCheck on .sh files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Install ShellCheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Find all shell scripts
+        run: |
+          echo "##> Checking for .sh files…"
+          find . -type f -name '*.sh' | tee sh-files.txt
+
+      - name: Run ShellCheck
+        if: steps.find.outputs.found == 'true'
+        run: |
+          xargs shellcheck < sh-files.txt
+
